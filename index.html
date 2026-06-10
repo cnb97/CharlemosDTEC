@@ -909,45 +909,51 @@
       if (error) showError("No se ha podido borrar.");
     }
 
-    async function closeSession() {
-     closeSession()
-      }
+   async function closeSession() {
+  if (!isCreator || !currentSession) return;
+  if (!confirm("¿Cerrar la sesión y borrar todas sus preguntas?")) return;
 
-      questions = [];
-      renderCreatorQuestions();
-      document.getElementById("sessionStatus").textContent = "Cerrada";
-      showSuccess("Sesión cerrada y preguntas eliminadas.");
-    }
+  const sessionId = currentSession.id;
 
-    async function copyCode() {
-      await navigator.clipboard.writeText(currentSession.code);
-      showSuccess("Código copiado.");
-    }
+  const { error: deleteError } = await db
+    .from("questions")
+    .delete()
+    .eq("session_id", sessionId);
 
-    async function copyPublicLink() {
-      await navigator.clipboard.writeText(publicLink());
-      showSuccess("Enlace copiado.");
-    }
+  if (deleteError) {
+    showError("No se han podido borrar las preguntas.");
+    return;
+  }
 
-    function openPublicLink() {
-      window.open(publicLink(), "_blank");
-    }
+  const { error: updateError } = await db
+    .from("sessions")
+    .update({
+      is_active: false,
+      closed_at: new Date().toISOString()
+    })
+    .eq("id", sessionId);
 
-    searchInput.addEventListener("input", renderPublicQuestions);
-    categoryFilter.addEventListener("change", renderPublicQuestions);
+  if (updateError) {
+    showError("No se ha podido cerrar la sesión.");
+    return;
+  }
 
-    const params = new URLSearchParams(window.location.search);
-    const sessionCode = params.get("session");
-    const creatorId = params.get("creator");
+  if (realtimeChannel) {
+    db.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
 
-    if (sessionCode) {
-      document.getElementById("joinCode").value = sessionCode;
-      joinSession(sessionCode);
-    }
+  localStorage.removeItem("charlemos_creator_session");
 
-    if (creatorId) {
-      openCreatorById(creatorId);
-    }
+  currentSession = null;
+  questions = [];
+  isCreator = false;
+
+  window.history.replaceState(null, "", window.location.pathname);
+
+  showView("homeView");
+  showSuccess("Sesión cerrada correctamente.");
+}
   </script>
 </body>
 </html>
