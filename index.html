@@ -664,40 +664,61 @@
       showSuccess("Sesión creada.");
     }
 
-    async function joinSession(code) {
-      hideMessages();
+   async function joinSession(code) {
+  hideMessages();
 
-      const { data, error } = await db
-        .from("sessions")
-        .select("*")
-        .eq("code", normalizeCode(code))
-        .maybeSingle();
+  const cleanCode = normalizeCode(code);
 
-      if (error) {
-        showError("No se ha podido buscar la sesión: " + error.message);
-        return;
-      }
+  if (!cleanCode) {
+    showError("Introduce un código de sesión.");
+    return;
+  }
 
-      if (!data) {
-        showError("No existe ninguna sesión con ese código.");
-        return;
-      }
+  const button = joinSessionForm.querySelector("button[type='submit']");
+  button.disabled = true;
+  button.textContent = "Entrando...";
 
-      if (!data.is_active) {
-        showError("Esta sesión ya ha sido cerrada.");
-        return;
-      }
+  const { data, error } = await db
+    .from("sessions")
+    .select("*")
+    .eq("code", cleanCode)
+    .maybeSingle();
 
-      currentSession = data;
-      isCreator = false;
+  button.disabled = false;
+  button.textContent = "Entrar";
 
-      window.history.replaceState(null, "", "?session=" + encodeURIComponent(currentSession.code));
+  if (error) {
+    showError("No se ha podido buscar la sesión: " + error.message);
+    return;
+  }
 
-      showView("publicView");
-      updatePublicUI();
-      await loadQuestions();
-      subscribeRealtime();
-    }
+  if (!data) {
+    showError("No existe ninguna sesión con ese código.");
+    return;
+  }
+
+  if (!data.is_active) {
+    showError("Esta sesión ya ha sido cerrada.");
+    return;
+  }
+
+  currentSession = data;
+  isCreator = false;
+
+  document.getElementById("joinCode").value = cleanCode;
+
+  window.history.replaceState(
+    null,
+    "",
+    "?session=" + encodeURIComponent(currentSession.code)
+  );
+
+  showView("publicView");
+  updatePublicUI();
+
+  await loadQuestions();
+  subscribeRealtime();
+}
 
     async function openCreatorById(id) {
       hideMessages();
