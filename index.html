@@ -17,15 +17,10 @@
       --accent: #2947ff;
       --accent-soft: #e8ebff;
       --danger: #9b2c2c;
-      --danger-soft: #fff2f2;
-      --ok: #2f7d4f;
-      --ok-soft: #edf8f0;
       --radius: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -35,20 +30,20 @@
     }
 
     header {
-      padding: 42px 20px 26px;
+      padding: 44px 20px 30px;
       text-align: center;
       border-bottom: 1px solid var(--line);
     }
 
     header h1 {
       margin: 0;
-      font-size: clamp(2.3rem, 8vw, 5.8rem);
+      font-size: clamp(2.5rem, 9vw, 6rem);
       letter-spacing: -0.08em;
       line-height: 0.9;
     }
 
     header p {
-      max-width: 760px;
+      max-width: 720px;
       margin: 18px auto 0;
       color: var(--muted);
       line-height: 1.5;
@@ -56,26 +51,26 @@
 
     main {
       width: min(1120px, 92vw);
-      margin: 32px auto 80px;
+      margin: 34px auto 80px;
     }
 
-    .view {
-      display: none;
-    }
+    .view { display: none; }
+    .view.active { display: block; }
 
-    .view.active {
-      display: block;
-    }
-
-    .layout {
+    .home-grid,
+    .session-grid {
       display: grid;
       grid-template-columns: 390px 1fr;
       gap: 24px;
     }
 
-    .panel,
+    .home-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card,
     .question,
-    .hero-card,
+    .hero,
     .stat {
       background: var(--paper);
       border: 1px solid var(--line);
@@ -83,12 +78,12 @@
       box-shadow: 0 12px 30px rgba(40, 30, 20, 0.05);
     }
 
-    .panel {
-      padding: 22px;
+    .card {
+      padding: 24px;
       height: fit-content;
     }
 
-    .hero-card {
+    .hero {
       padding: 28px;
       margin-bottom: 20px;
       display: grid;
@@ -97,34 +92,21 @@
       align-items: center;
     }
 
-    .hero-card h2 {
+    .hero h2 {
       font-size: clamp(1.6rem, 4vw, 3rem);
       margin: 0 0 8px;
       letter-spacing: -0.06em;
     }
 
-    .hero-card p {
+    .hero p {
       margin: 0;
       color: var(--muted);
       line-height: 1.5;
     }
 
-    .badge {
-      background: var(--accent);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 0.86rem;
-      white-space: nowrap;
-    }
-
-    .badge.off {
-      background: var(--muted);
-    }
-
     h2 {
       margin: 0 0 16px;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
     }
 
     label {
@@ -161,26 +143,17 @@
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
-    button,
-    .button-link {
+    button {
       border: 0;
       border-radius: 999px;
-      padding: 10px 15px;
+      padding: 11px 16px;
       font: inherit;
       cursor: pointer;
       background: var(--ink);
       color: white;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
-    button:hover,
-    .button-link:hover {
-      opacity: 0.9;
-    }
+    button:hover { opacity: 0.9; }
 
     button:disabled {
       opacity: 0.55;
@@ -206,33 +179,54 @@
       border: 1px solid #e0b8b8;
     }
 
-    .link-button {
-      background: transparent;
-      color: var(--muted);
-      padding: 0;
-      text-decoration: underline;
-      border-radius: 0;
+    .badge {
+      background: var(--accent);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      white-space: nowrap;
     }
 
-    .filters,
-    .tools {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      align-items: center;
+    .badge.private {
+      background: var(--ink);
     }
 
-    .filters input {
-      flex: 1;
-      min-width: 220px;
+    .badge.closed {
+      background: var(--muted);
     }
 
-    .filters select {
-      width: 180px;
+    .notice {
+      margin-top: 16px;
+      padding: 13px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
-    .question-list {
+    .error {
+      display: none;
+      background: #fff2f2;
+      border: 1px solid #efb5b5;
+      color: #8a1f1f;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .success {
+      display: none;
+      background: #edf8f0;
+      border: 1px solid #b9dac5;
+      color: #2f7d4f;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .questions {
       display: grid;
       gap: 14px;
     }
@@ -265,7 +259,7 @@
       font-weight: 700;
     }
 
-    .tag.new {
+    .tag.dark {
       background: var(--ink);
       color: white;
     }
@@ -278,62 +272,42 @@
       white-space: pre-wrap;
     }
 
-    .actions {
+    .actions,
+    .filters,
+    .tools {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
       margin-top: 16px;
     }
 
-    .count {
-      font-variant-numeric: tabular-nums;
-      font-weight: 700;
+    .filters {
+      margin-top: 0;
+      margin-bottom: 18px;
     }
 
-    .empty,
-    .loading {
-      text-align: center;
-      color: var(--muted);
-      padding: 50px 20px;
-      border: 1px dashed var(--line);
-      border-radius: var(--radius);
+    .filters input {
+      flex: 1;
+      min-width: 220px;
     }
 
-    .notice {
-      margin-top: 16px;
-      padding: 13px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-radius: 14px;
-      font-size: 0.9rem;
-      line-height: 1.4;
+    .filters select {
+      width: 180px;
     }
 
-    .error {
-      background: var(--danger-soft);
-      border: 1px solid #efb5b5;
-      color: #8a1f1f;
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .success {
-      background: var(--ok-soft);
-      border: 1px solid #b9dac5;
-      color: var(--ok);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 16px;
-      display: none;
+    .copy-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .stats {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .stat {
@@ -351,31 +325,12 @@
       font-size: 0.9rem;
     }
 
-    .copy-box {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .home-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .home-options .panel {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 240px;
-    }
-
-    .small-text {
+    .empty {
+      text-align: center;
       color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.5;
-      margin: 0;
+      padding: 50px 20px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
     }
 
     footer {
@@ -386,22 +341,19 @@
     }
 
     @media (max-width: 900px) {
-      .layout,
-      .hero-card,
-      .home-options {
+      .home-grid,
+      .session-grid,
+      .hero,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .copy-row {
         grid-template-columns: 1fr;
       }
 
       .badge {
         width: fit-content;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .copy-box {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -410,7 +362,7 @@
 <body>
   <header>
     <h1>Charlemos DTEC</h1>
-    <p id="headerText">Crea una sesión de preguntas para una charla o entra a una sesión existente con enlace/código.</p>
+    <p>Crear una sesión, compartir un código y recibir preguntas en directo sin refrescar.</p>
   </header>
 
   <main>
@@ -418,114 +370,44 @@
     <div id="successBox" class="success"></div>
 
     <section id="homeView" class="view active">
-      <div class="hero-card">
-        <div>
-          <h2>Preguntas en directo por sesión</h2>
-          <p>Crea una sesión con título, comparte el enlace y recoge preguntas durante la charla. Al cerrar la sesión, sus preguntas se limpian.</p>
-        </div>
-        <div class="badge">● live Q&A</div>
-      </div>
-
-      <div class="home-options">
-        <div class="panel">
-          <div>
-            <h2>Entrar a una sesión</h2>
-            <p class="small-text">Para asistentes. Pueden preguntar y votar sin registrarse.</p>
-            <form id="joinForm">
-              <label for="sessionCodeInput">Código de sesión</label>
-              <input id="sessionCodeInput" placeholder="Ej. DTEC-ABC123" required />
-              <button class="primary" type="submit">Entrar</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div>
-            <h2>Crear / gestionar sesión</h2>
-            <p class="small-text">Para quien organiza la charla. Permite crear sesión, copiar enlace, borrar preguntas y cerrar la sesión.</p>
-          </div>
-          <button class="primary" type="button" onclick="showView('creatorLoginView')">Crear o gestionar</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="creatorLoginView" class="view">
-      <div class="panel">
-        <h2>Acceso de creador/a</h2>
-        <form id="creatorPasswordForm">
-          <label for="creatorPasswordInput">Contraseña</label>
-          <input id="creatorPasswordInput" type="password" placeholder="Contraseña de sesión" required />
-          <button class="primary" type="submit">Entrar</button>
-        </form>
-        <div class="notice">
-          Contraseña por defecto: <strong>DTEC2026</strong>. Puedes cambiarla dentro del código, en la variable <strong>CREATOR_PASSWORD</strong>.
-        </div>
-        <div class="actions">
-          <button class="link-button" type="button" onclick="showView('homeView')">Volver</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="creatorView" class="view">
-      <div class="layout">
-        <aside class="panel">
+      <div class="home-grid">
+        <div class="card">
           <h2>Crear sesión</h2>
-
           <form id="createSessionForm">
-            <label for="newSessionTitleInput">Título de la sesión</label>
-            <input id="newSessionTitleInput" placeholder="Ej. Charla prácticas DTEC" required />
+            <label for="sessionName">Nombre de la sesión</label>
+            <input id="sessionName" placeholder="Ej. Charla prácticas DTEC" required />
             <button class="primary" type="submit">Crear sesión</button>
           </form>
-
-          <div id="sharePanel" class="notice" style="display:none;">
-            <strong>Enlace para asistentes</strong>
-            <div class="copy-box">
-              <input id="shareLinkInput" readonly />
-              <button type="button" onclick="copyShareLink()">Copiar</button>
-            </div>
-            <p style="margin-bottom:0;">Código: <strong id="sessionCodeText"></strong></p>
+          <div class="notice">
+            Se generará un código para asistentes y esta pantalla quedará como vista de creador/a.
           </div>
+        </div>
 
-          <div class="actions">
-            <button class="secondary" type="button" onclick="showView('homeView')">Salir</button>
+        <div class="card">
+          <h2>Unirse a sesión</h2>
+          <form id="joinSessionForm">
+            <label for="joinCode">Código de sesión</label>
+            <input id="joinCode" placeholder="Ej. DTEC-1234" required />
+            <button class="primary" type="submit">Entrar</button>
+          </form>
+          <div class="notice">
+            Solo necesitas el código de sesión. Las preguntas se actualizan solas.
           </div>
-        </aside>
-
-        <section>
-          <div class="stats">
-            <div class="stat">
-              <strong id="creatorSessionStatus">—</strong>
-              <span>estado de la sesión</span>
-            </div>
-            <div class="stat">
-              <strong id="creatorTotalCount">0</strong>
-              <span>preguntas registradas</span>
-            </div>
-          </div>
-
-          <div class="tools">
-            <button class="secondary" onclick="loadQuestions()">Actualizar</button>
-            <button class="danger" onclick="closeSession()">Cerrar sesión y limpiar preguntas</button>
-          </div>
-
-          <div id="creatorQuestionList" class="question-list">
-            <div class="empty">Crea una sesión para ver preguntas.</div>
-          </div>
-        </section>
+        </div>
       </div>
     </section>
 
-    <section id="publicSessionView" class="view">
-      <div class="hero-card">
+    <section id="publicView" class="view">
+      <div class="hero">
         <div>
-          <h2 id="publicSessionTitle">Sesión</h2>
-          <p>Escribe una duda breve. Si otra pregunta también te interesa, puedes votarla.</p>
+          <h2 id="publicTitle">Sesión</h2>
+          <p>Escribe tu pregunta o vota las que también te interesan.</p>
         </div>
-        <div id="publicSessionBadge" class="badge">● sesión activa</div>
+        <div id="publicBadge" class="badge">● en directo</div>
       </div>
 
-      <div class="layout">
-        <aside class="panel">
+      <div class="session-grid">
+        <aside class="card">
           <h2>Enviar pregunta</h2>
 
           <form id="questionForm">
@@ -534,6 +416,7 @@
 
             <label for="category">Tema</label>
             <select id="category" required>
+              <option value="General">General</option>
               <option value="Asignaturas">Asignaturas</option>
               <option value="TFG">TFG</option>
               <option value="Prácticas">Prácticas</option>
@@ -541,25 +424,21 @@
               <option value="Portfolio">Portfolio</option>
               <option value="Futuro profesional">Futuro profesional</option>
               <option value="Vida DTEC">Vida DTEC</option>
-              <option value="Otra">Otra</option>
             </select>
 
-            <label for="title">Pregunta</label>
-            <textarea id="title" required maxlength="360" placeholder="Escribe aquí tu pregunta..."></textarea>
+            <label for="questionText">Pregunta</label>
+            <textarea id="questionText" required maxlength="360" placeholder="Escribe aquí tu pregunta..."></textarea>
 
-            <button class="primary" id="submitQuestionButton" type="submit">Enviar pregunta</button>
+            <button id="submitQuestionButton" class="primary" type="submit">Enviar pregunta</button>
           </form>
-
-          <div class="notice">
-            Las preguntas quedan registradas dentro de esta sesión y se ordenan por votos.
-          </div>
         </aside>
 
         <section>
           <div class="filters">
-            <input id="search" placeholder="Buscar preguntas..." />
-            <select id="filterCategory">
+            <input id="searchInput" placeholder="Buscar preguntas..." />
+            <select id="categoryFilter">
               <option value="Todas">Todas</option>
+              <option value="General">General</option>
               <option value="Asignaturas">Asignaturas</option>
               <option value="TFG">TFG</option>
               <option value="Prácticas">Prácticas</option>
@@ -567,52 +446,100 @@
               <option value="Portfolio">Portfolio</option>
               <option value="Futuro profesional">Futuro profesional</option>
               <option value="Vida DTEC">Vida DTEC</option>
-              <option value="Otra">Otra</option>
             </select>
           </div>
 
-          <div id="publicQuestionList" class="question-list">
-            <div class="loading">Cargando preguntas...</div>
+          <div id="publicQuestions" class="questions">
+            <div class="empty">Todavía no hay preguntas.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="creatorView" class="view">
+      <div class="hero">
+        <div>
+          <h2 id="creatorTitle">Sesión creada</h2>
+          <p>Comparte el código con asistentes. Desde esta vista puedes borrar preguntas.</p>
+        </div>
+        <div class="badge private">vista creador/a</div>
+      </div>
+
+      <div class="session-grid">
+        <aside class="card">
+          <h2>Código de sesión</h2>
+
+          <label>Código para asistentes</label>
+          <div class="copy-row">
+            <input id="sessionCodeDisplay" readonly />
+            <button type="button" onclick="copyCode()">Copiar</button>
+          </div>
+
+          <label>Enlace público</label>
+          <div class="copy-row">
+            <input id="publicLinkDisplay" readonly />
+            <button type="button" onclick="copyPublicLink()">Copiar</button>
+          </div>
+
+          <div class="notice">
+            Guarda esta pestaña abierta para moderar. Si cierras la sesión, se borran sus preguntas.
+          </div>
+
+          <div class="tools">
+            <button class="secondary" type="button" onclick="openPublicLink()">Abrir vista pública</button>
+            <button class="danger" type="button" onclick="closeSession()">Cerrar y limpiar</button>
+          </div>
+        </aside>
+
+        <section>
+          <div class="stats">
+            <div class="stat">
+              <strong id="sessionStatus">Activa</strong>
+              <span>estado</span>
+            </div>
+            <div class="stat">
+              <strong id="questionCount">0</strong>
+              <span>preguntas</span>
+            </div>
+          </div>
+
+          <div id="creatorQuestions" class="questions">
+            <div class="empty">Todavía no hay preguntas.</div>
           </div>
         </section>
       </div>
     </section>
   </main>
 
-  <footer>
-    Charlemos DTEC · preguntas en directo
-  </footer>
+  <footer>Charlemos DTEC · preguntas en directo</footer>
 
   <script>
-    const CREATOR_PASSWORD = "DTEC2026";
-
     const SUPABASE_URL = "https://ctoknbsfydtbwcdwoosy.supabase.co";
     const SUPABASE_KEY = "sb_publishable_oxyo0yIspxzVQfPoRvVYlw_RReyLtU2";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    const homeView = document.getElementById("homeView");
+    const publicView = document.getElementById("publicView");
+    const creatorView = document.getElementById("creatorView");
+
     const errorBox = document.getElementById("errorBox");
     const successBox = document.getElementById("successBox");
 
-    const joinForm = document.getElementById("joinForm");
-    const sessionCodeInput = document.getElementById("sessionCodeInput");
-
-    const creatorPasswordForm = document.getElementById("creatorPasswordForm");
     const createSessionForm = document.getElementById("createSessionForm");
-
+    const joinSessionForm = document.getElementById("joinSessionForm");
     const questionForm = document.getElementById("questionForm");
-    const publicQuestionList = document.getElementById("publicQuestionList");
-    const creatorQuestionList = document.getElementById("creatorQuestionList");
-    const searchInput = document.getElementById("search");
-    const filterCategory = document.getElementById("filterCategory");
-    const submitQuestionButton = document.getElementById("submitQuestionButton");
+
+    const searchInput = document.getElementById("searchInput");
+    const categoryFilter = document.getElementById("categoryFilter");
 
     let currentSession = null;
     let questions = [];
-    let creatorUnlocked = false;
+    let isCreator = false;
+    let realtimeChannel = null;
 
-    function showView(viewId) {
-      document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
-      document.getElementById(viewId).classList.add("active");
+    function showView(id) {
+      [homeView, publicView, creatorView].forEach(view => view.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
       hideMessages();
     }
 
@@ -629,51 +556,29 @@
     }
 
     function hideMessages() {
-      errorBox.textContent = "";
       errorBox.style.display = "none";
-      successBox.textContent = "";
       successBox.style.display = "none";
+    }
+
+    function generateCode() {
+      return "DTEC-" + Math.random().toString(36).substring(2, 6).toUpperCase();
     }
 
     function normalizeCode(code) {
       return String(code || "").trim().toUpperCase();
     }
 
-    function generateCode() {
-      return "DTEC-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    function publicLink() {
+      return window.location.href.split("?")[0] + "?session=" + encodeURIComponent(currentSession.code);
     }
 
-    function getPublicURL(code) {
-      const url = new URL(window.location.href);
-      url.searchParams.set("session", code);
-      return url.toString();
-    }
-
-    function getSessionCodeFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("session") || "";
-    }
-
-    async function findSessionByCode(code) {
-      const normalizedCode = normalizeCode(code);
-
-      const { data, error } = await db
-        .from("sessions")
-        .select("*")
-        .eq("code", normalizedCode)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    }
-
-    function formatDate(dateString) {
+    function formatDate(date) {
       return new Intl.DateTimeFormat("es", {
         day: "2-digit",
         month: "short",
         hour: "2-digit",
         minute: "2-digit"
-      }).format(new Date(dateString));
+      }).format(new Date(date));
     }
 
     function escapeHTML(text) {
@@ -686,185 +591,7 @@
       }[char]));
     }
 
-    function updateSessionStatusUI() {
-      if (!currentSession) return;
-
-      document.getElementById("publicSessionTitle").textContent = currentSession.title;
-      document.getElementById("creatorSessionStatus").textContent = currentSession.is_active ? "Activa" : "Cerrada";
-      document.getElementById("creatorTotalCount").textContent = questions.length;
-
-      const publicBadge = document.getElementById("publicSessionBadge");
-      if (currentSession.is_active) {
-        publicBadge.textContent = "● sesión activa";
-        publicBadge.classList.remove("off");
-        submitQuestionButton.disabled = false;
-        submitQuestionButton.textContent = "Enviar pregunta";
-      } else {
-        publicBadge.textContent = "sesión cerrada";
-        publicBadge.classList.add("off");
-        submitQuestionButton.disabled = true;
-        submitQuestionButton.textContent = "Sesión cerrada";
-      }
-
-      document.getElementById("sharePanel").style.display = "block";
-      document.getElementById("shareLinkInput").value = getPublicURL(currentSession.code);
-      document.getElementById("sessionCodeText").textContent = currentSession.code;
-    }
-
-    async function enterPublicSession(code) {
-      hideMessages();
-
-      const session = await findSessionByCode(code);
-
-      if (!session) {
-        showError("No existe ninguna sesión con ese código.");
-        return;
-      }
-
-      currentSession = session;
-
-      const url = new URL(window.location.href);
-      url.searchParams.set("session", currentSession.code);
-      window.history.replaceState(null, "", url.toString());
-
-      showView("publicSessionView");
-      updateSessionStatusUI();
-      await loadQuestions();
-    }
-
-    async function loadQuestions() {
-      if (!currentSession) return;
-
-      hideMessages();
-
-      const { data, error } = await db
-        .from("questions")
-        .select("*")
-        .eq("session_id", currentSession.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        showError("No se han podido cargar las preguntas: " + error.message);
-        return;
-      }
-
-      questions = data || [];
-      updateSessionStatusUI();
-      renderPublicQuestions();
-      renderCreatorQuestions();
-    }
-
-    function getFilteredPublicQuestions() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const selectedCategory = filterCategory.value;
-
-      return questions
-        .filter(q => selectedCategory === "Todas" || q.category === selectedCategory)
-        .filter(q =>
-          (q.title || "").toLowerCase().includes(searchTerm) ||
-          (q.category || "").toLowerCase().includes(searchTerm) ||
-          (q.alias || "").toLowerCase().includes(searchTerm)
-        )
-        .sort((a, b) => {
-          const voteDifference = (b.votes || 0) - (a.votes || 0);
-          if (voteDifference !== 0) return voteDifference;
-          return new Date(b.created_at) - new Date(a.created_at);
-        });
-    }
-
-    function renderPublicQuestions() {
-      const filteredQuestions = getFilteredPublicQuestions();
-
-      if (filteredQuestions.length === 0) {
-        publicQuestionList.innerHTML = `<div class="empty">Todavía no hay preguntas.</div>`;
-        return;
-      }
-
-      publicQuestionList.innerHTML = filteredQuestions.map(q => `
-        <article class="question">
-          <div class="meta">
-            <span class="tag">${escapeHTML(q.category)}</span>
-            <span>por ${escapeHTML(q.alias || "anon")}</span>
-            <span>·</span>
-            <span>${formatDate(q.created_at)}</span>
-          </div>
-
-          <h3>${escapeHTML(q.title)}</h3>
-
-          <div class="actions">
-            <button class="secondary" onclick="voteQuestion('${q.id}')">
-              También quiero saberlo · <span class="count">${q.votes || 0}</span>
-            </button>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    function renderCreatorQuestions() {
-      document.getElementById("creatorTotalCount").textContent = questions.length;
-
-      if (!questions.length) {
-        creatorQuestionList.innerHTML = `<div class="empty">Todavía no hay preguntas en esta sesión.</div>`;
-        return;
-      }
-
-      const sortedQuestions = [...questions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      const newestId = sortedQuestions[0].id;
-
-      creatorQuestionList.innerHTML = sortedQuestions.map(q => `
-        <article class="question ${q.id === newestId ? "newest" : ""}">
-          <div class="meta">
-            ${q.id === newestId ? `<span class="tag new">Última</span>` : ``}
-            <span class="tag">${escapeHTML(q.category)}</span>
-            <span>por ${escapeHTML(q.alias || "anon")}</span>
-            <span>·</span>
-            <span>${formatDate(q.created_at)}</span>
-            <span>·</span>
-            <span><strong>${q.votes || 0}</strong> votos</span>
-          </div>
-
-          <h3>${escapeHTML(q.title)}</h3>
-
-          <div class="actions">
-            <button class="danger" onclick="deleteQuestion('${q.id}')">Borrar pregunta</button>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    joinForm.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      try {
-        await enterPublicSession(sessionCodeInput.value);
-      } catch (error) {
-        showError("No se ha podido entrar a la sesión: " + error.message);
-      }
-    });
-
-    creatorPasswordForm.addEventListener("submit", event => {
-      event.preventDefault();
-
-      if (document.getElementById("creatorPasswordInput").value !== CREATOR_PASSWORD) {
-        showError("Contraseña incorrecta.");
-        return;
-      }
-
-      creatorUnlocked = true;
-      showView("creatorView");
-
-      if (currentSession) {
-        updateSessionStatusUI();
-        renderCreatorQuestions();
-      }
-    });
-
-    createSessionForm.addEventListener("submit", async event => {
-      event.preventDefault();
-      hideMessages();
-
-      const title = document.getElementById("newSessionTitleInput").value.trim();
-
+    async function createSession(title) {
       const newSession = {
         title,
         code: generateCode(),
@@ -883,50 +610,268 @@
       }
 
       currentSession = data;
+      isCreator = true;
       questions = [];
-      updateSessionStatusUI();
+
+      localStorage.setItem("charlemos_creator_session", currentSession.id);
+
+      document.getElementById("creatorTitle").textContent = currentSession.title;
+      document.getElementById("sessionCodeDisplay").value = currentSession.code;
+      document.getElementById("publicLinkDisplay").value = publicLink();
+      document.getElementById("sessionStatus").textContent = "Activa";
+      document.getElementById("questionCount").textContent = "0";
+
+      window.history.replaceState(null, "", "?creator=" + currentSession.id);
+
+      showView("creatorView");
       renderCreatorQuestions();
+      subscribeRealtime();
 
-      const url = new URL(window.location.href);
-      url.searchParams.set("session", currentSession.code);
-      window.history.replaceState(null, "", url.toString());
+      showSuccess("Sesión creada. Comparte el código con asistentes.");
+    }
 
-      showSuccess("Sesión creada correctamente.");
+    async function joinSession(code) {
+      const { data, error } = await db
+        .from("sessions")
+        .select("*")
+        .eq("code", normalizeCode(code))
+        .maybeSingle();
+
+      if (error) {
+        showError("No se ha podido buscar la sesión: " + error.message);
+        return;
+      }
+
+      if (!data) {
+        showError("No existe ninguna sesión con ese código.");
+        return;
+      }
+
+      currentSession = data;
+      isCreator = false;
+
+      document.getElementById("publicTitle").textContent = currentSession.title;
+      document.getElementById("publicBadge").textContent = currentSession.is_active ? "● en directo" : "sesión cerrada";
+      document.getElementById("publicBadge").classList.toggle("closed", !currentSession.is_active);
+      document.getElementById("submitQuestionButton").disabled = !currentSession.is_active;
+      document.getElementById("submitQuestionButton").textContent = currentSession.is_active ? "Enviar pregunta" : "Sesión cerrada";
+
+      window.history.replaceState(null, "", "?session=" + encodeURIComponent(currentSession.code));
+
+      showView("publicView");
+      await loadQuestions();
+      subscribeRealtime();
+    }
+
+    async function openCreatorById(id) {
+      const creatorId = localStorage.getItem("charlemos_creator_session");
+
+      if (creatorId !== id) {
+        showError("Esta sesión solo puede gestionarse desde el navegador que la creó.");
+        return;
+      }
+
+      const { data, error } = await db
+        .from("sessions")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error || !data) {
+        showError("No se ha podido abrir la sesión.");
+        return;
+      }
+
+      currentSession = data;
+      isCreator = true;
+
+      document.getElementById("creatorTitle").textContent = currentSession.title;
+      document.getElementById("sessionCodeDisplay").value = currentSession.code;
+      document.getElementById("publicLinkDisplay").value = publicLink();
+      document.getElementById("sessionStatus").textContent = currentSession.is_active ? "Activa" : "Cerrada";
+
+      showView("creatorView");
+      await loadQuestions();
+      subscribeRealtime();
+    }
+
+    async function loadQuestions() {
+      if (!currentSession) return;
+
+      const { data, error } = await db
+        .from("questions")
+        .select("*")
+        .eq("session_id", currentSession.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showError("No se han podido cargar las preguntas: " + error.message);
+        return;
+      }
+
+      questions = data || [];
+      renderPublicQuestions();
+      renderCreatorQuestions();
+    }
+
+    function filteredQuestions() {
+      const search = searchInput.value.toLowerCase();
+      const category = categoryFilter.value;
+
+      return questions
+        .filter(q => category === "Todas" || q.category === category)
+        .filter(q =>
+          (q.title || "").toLowerCase().includes(search) ||
+          (q.alias || "").toLowerCase().includes(search) ||
+          (q.category || "").toLowerCase().includes(search)
+        )
+        .sort((a, b) => {
+          const voteDiff = (b.votes || 0) - (a.votes || 0);
+          if (voteDiff !== 0) return voteDiff;
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+    }
+
+    function renderPublicQuestions() {
+      const container = document.getElementById("publicQuestions");
+      const list = filteredQuestions();
+
+      if (!list.length) {
+        container.innerHTML = `<div class="empty">Todavía no hay preguntas.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(q => `
+        <article class="question">
+          <div class="meta">
+            <span class="tag">${escapeHTML(q.category)}</span>
+            <span>por ${escapeHTML(q.alias || "anon")}</span>
+            <span>·</span>
+            <span>${formatDate(q.created_at)}</span>
+          </div>
+          <h3>${escapeHTML(q.title)}</h3>
+          <div class="actions">
+            <button class="secondary" onclick="voteQuestion('${q.id}')">
+              También quiero saberlo · <span class="count">${q.votes || 0}</span>
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderCreatorQuestions() {
+      const container = document.getElementById("creatorQuestions");
+      document.getElementById("questionCount").textContent = questions.length;
+
+      if (!questions.length) {
+        container.innerHTML = `<div class="empty">Todavía no hay preguntas.</div>`;
+        return;
+      }
+
+      const list = [...questions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      const newestId = list[0].id;
+
+      container.innerHTML = list.map(q => `
+        <article class="question ${q.id === newestId ? "newest" : ""}">
+          <div class="meta">
+            ${q.id === newestId ? `<span class="tag dark">Última</span>` : ""}
+            <span class="tag">${escapeHTML(q.category)}</span>
+            <span>por ${escapeHTML(q.alias || "anon")}</span>
+            <span>·</span>
+            <span>${formatDate(q.created_at)}</span>
+            <span>·</span>
+            <span><strong>${q.votes || 0}</strong> votos</span>
+          </div>
+          <h3>${escapeHTML(q.title)}</h3>
+          <div class="actions">
+            <button class="danger" onclick="deleteQuestion('${q.id}')">Borrar</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function subscribeRealtime() {
+      if (!currentSession) return;
+
+      if (realtimeChannel) {
+        db.removeChannel(realtimeChannel);
+      }
+
+      realtimeChannel = db
+        .channel("session-" + currentSession.id)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "questions",
+            filter: "session_id=eq." + currentSession.id
+          },
+          () => loadQuestions()
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "sessions",
+            filter: "id=eq." + currentSession.id
+          },
+          async payload => {
+            if (payload.new) {
+              currentSession = payload.new;
+
+              if (!currentSession.is_active) {
+                document.getElementById("publicBadge").textContent = "sesión cerrada";
+                document.getElementById("publicBadge").classList.add("closed");
+                document.getElementById("submitQuestionButton").disabled = true;
+                document.getElementById("submitQuestionButton").textContent = "Sesión cerrada";
+                document.getElementById("sessionStatus").textContent = "Cerrada";
+              }
+            }
+
+            await loadQuestions();
+          }
+        )
+        .subscribe(status => {
+          console.log("Realtime:", status);
+        });
+    }
+
+    createSessionForm.addEventListener("submit", event => {
+      event.preventDefault();
+      createSession(document.getElementById("sessionName").value.trim());
     });
 
-    async function copyShareLink() {
-      const input = document.getElementById("shareLinkInput");
-      await navigator.clipboard.writeText(input.value);
-      showSuccess("Enlace copiado.");
-    }
+    joinSessionForm.addEventListener("submit", event => {
+      event.preventDefault();
+      joinSession(document.getElementById("joinCode").value);
+    });
 
     questionForm.addEventListener("submit", async event => {
       event.preventDefault();
-      hideMessages();
 
       if (!currentSession || !currentSession.is_active) {
         showError("Esta sesión está cerrada.");
         return;
       }
 
-      const submitButton = questionForm.querySelector("button[type='submit']");
-      submitButton.disabled = true;
-      submitButton.textContent = "Enviando...";
+      const button = document.getElementById("submitQuestionButton");
+      button.disabled = true;
+      button.textContent = "Enviando...";
 
-      const newQuestion = {
+      const question = {
         session_id: currentSession.id,
         alias: document.getElementById("alias").value.trim() || "anon",
         category: document.getElementById("category").value,
-        title: document.getElementById("title").value.trim(),
+        title: document.getElementById("questionText").value.trim(),
         votes: 0
       };
 
-      const { error } = await db
-        .from("questions")
-        .insert([newQuestion]);
+      const { error } = await db.from("questions").insert([question]);
 
-      submitButton.disabled = false;
-      submitButton.textContent = "Enviar pregunta";
+      button.disabled = false;
+      button.textContent = "Enviar pregunta";
 
       if (error) {
         showError("No se ha podido enviar la pregunta: " + error.message);
@@ -934,18 +879,9 @@
       }
 
       questionForm.reset();
-      await loadQuestions();
-      document.querySelector("main").scrollIntoView({ behavior: "smooth" });
     });
 
     async function voteQuestion(id) {
-      hideMessages();
-
-      if (!currentSession || !currentSession.is_active) {
-        showError("Esta sesión está cerrada.");
-        return;
-      }
-
       const question = questions.find(q => q.id === id);
       if (!question) return;
 
@@ -954,19 +890,12 @@
         .update({ votes: (question.votes || 0) + 1 })
         .eq("id", id);
 
-      if (error) {
-        showError("No se ha podido votar: " + error.message);
-        return;
-      }
-
-      await loadQuestions();
+      if (error) showError("No se ha podido votar.");
     }
 
     async function deleteQuestion(id) {
-      hideMessages();
-
-      if (!creatorUnlocked) {
-        showError("Solo la persona creadora puede borrar preguntas.");
+      if (!isCreator) {
+        showError("Solo puede borrar preguntas quien creó la sesión.");
         return;
       }
 
@@ -977,92 +906,62 @@
         .delete()
         .eq("id", id);
 
-      if (error) {
-        showError("No se ha podido borrar la pregunta: " + error.message);
-        return;
-      }
-
-      await loadQuestions();
+      if (error) showError("No se ha podido borrar.");
     }
 
     async function closeSession() {
-      hideMessages();
+      if (!isCreator || !currentSession) return;
+      if (!confirm("¿Cerrar la sesión y borrar todas sus preguntas?")) return;
 
-      if (!creatorUnlocked) {
-        showError("Solo la persona creadora puede cerrar la sesión.");
-        return;
-      }
+      await db.from("questions").delete().eq("session_id", currentSession.id);
 
-      if (!currentSession) {
-        showError("No hay ninguna sesión cargada.");
-        return;
-      }
-
-      if (!confirm("¿Cerrar esta sesión y borrar todas sus preguntas?")) return;
-
-      const { error: deleteError } = await db
-        .from("questions")
-        .delete()
-        .eq("session_id", currentSession.id);
-
-      if (deleteError) {
-        showError("No se han podido borrar las preguntas: " + deleteError.message);
-        return;
-      }
-
-      const { data, error: updateError } = await db
+      const { error } = await db
         .from("sessions")
         .update({
           is_active: false,
           closed_at: new Date().toISOString()
         })
-        .eq("id", currentSession.id)
-        .select()
-        .single();
+        .eq("id", currentSession.id);
 
-      if (updateError) {
-        showError("No se ha podido cerrar la sesión: " + updateError.message);
+      if (error) {
+        showError("No se ha podido cerrar la sesión.");
         return;
       }
 
-      currentSession = data;
       questions = [];
-      updateSessionStatusUI();
       renderCreatorQuestions();
-      renderPublicQuestions();
-      showSuccess("Sesión cerrada y preguntas limpiadas.");
+      document.getElementById("sessionStatus").textContent = "Cerrada";
+      showSuccess("Sesión cerrada y preguntas eliminadas.");
+    }
+
+    async function copyCode() {
+      await navigator.clipboard.writeText(currentSession.code);
+      showSuccess("Código copiado.");
+    }
+
+    async function copyPublicLink() {
+      await navigator.clipboard.writeText(publicLink());
+      showSuccess("Enlace copiado.");
+    }
+
+    function openPublicLink() {
+      window.open(publicLink(), "_blank");
     }
 
     searchInput.addEventListener("input", renderPublicQuestions);
-    filterCategory.addEventListener("change", renderPublicQuestions);
+    categoryFilter.addEventListener("change", renderPublicQuestions);
 
-    db.channel("charlemos-dtec-live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "questions" }, () => {
-        if (currentSession) loadQuestions();
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "sessions" }, async () => {
-        if (!currentSession) return;
+    const params = new URLSearchParams(window.location.search);
+    const sessionCode = params.get("session");
+    const creatorId = params.get("creator");
 
-        try {
-          const refreshedSession = await findSessionByCode(currentSession.code);
-          if (refreshedSession) {
-            currentSession = refreshedSession;
-            updateSessionStatusUI();
-            await loadQuestions();
-          }
-        } catch (error) {
-          showError("No se ha podido actualizar la sesión: " + error.message);
-        }
-      })
-      .subscribe();
+    if (sessionCode) {
+      document.getElementById("joinCode").value = sessionCode;
+      joinSession(sessionCode);
+    }
 
-    const initialCode = getSessionCodeFromURL();
-
-    if (initialCode) {
-      sessionCodeInput.value = initialCode;
-      enterPublicSession(initialCode).catch(error => {
-        showError("No se ha podido entrar a la sesión: " + error.message);
-      });
+    if (creatorId) {
+      openCreatorById(creatorId);
     }
   </script>
 </body>
