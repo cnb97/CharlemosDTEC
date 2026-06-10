@@ -421,6 +421,8 @@
               <option value="TFG">TFG</option>
               <option value="Prácticas">Prácticas</option>
               <option value="Erasmus">Erasmus</option>
+              <option value="Portfolio">Portfolio</option>
+              <option value="Futuro profesional">Futuro profesional</option>
               <option value="Vida DTEC">Vida DTEC</option>
             </select>
 
@@ -551,6 +553,9 @@
       successBox.textContent = message;
       successBox.style.display = "block";
       errorBox.style.display = "none";
+      setTimeout(() => {
+        successBox.style.display = "none";
+      }, 1800);
     }
 
     function hideMessages() {
@@ -567,6 +572,7 @@
     }
 
     function publicLink() {
+      if (!currentSession) return "";
       return window.location.href.split("?")[0] + "?session=" + encodeURIComponent(currentSession.code);
     }
 
@@ -589,9 +595,41 @@
       }[char]));
     }
 
+    function updateCreatorUI() {
+      if (!currentSession) return;
+
+      document.getElementById("creatorTitle").textContent = currentSession.title;
+      document.getElementById("sessionCodeDisplay").value = currentSession.code;
+      document.getElementById("publicLinkDisplay").value = publicLink();
+      document.getElementById("sessionStatus").textContent = currentSession.is_active ? "Activa" : "Cerrada";
+      document.getElementById("questionCount").textContent = questions.length;
+    }
+
+    function updatePublicUI() {
+      if (!currentSession) return;
+
+      document.getElementById("publicTitle").textContent = currentSession.title;
+      document.getElementById("publicBadge").textContent = currentSession.is_active ? "● en directo" : "sesión cerrada";
+      document.getElementById("publicBadge").classList.toggle("closed", !currentSession.is_active);
+      document.getElementById("submitQuestionButton").disabled = !currentSession.is_active;
+      document.getElementById("submitQuestionButton").textContent = currentSession.is_active ? "Enviar pregunta" : "Sesión cerrada";
+    }
+
     async function createSession(title) {
+      hideMessages();
+
+      const cleanTitle = String(title || "").trim();
+      if (!cleanTitle) {
+        showError("Pon un nombre para la sesión.");
+        return;
+      }
+
+      const button = createSessionForm.querySelector("button[type='submit']");
+      button.disabled = true;
+      button.textContent = "Creando...";
+
       const newSession = {
-        title,
+        title: cleanTitle,
         code: generateCode(),
         is_active: true
       };
@@ -601,6 +639,9 @@
         .insert([newSession])
         .select()
         .single();
+
+      button.disabled = false;
+      button.textContent = "Crear sesión";
 
       if (error) {
         showError("No se ha podido crear la sesión: " + error.message);
@@ -613,22 +654,19 @@
 
       localStorage.setItem("charlemos_creator_session", currentSession.id);
 
-      document.getElementById("creatorTitle").textContent = currentSession.title;
-      document.getElementById("sessionCodeDisplay").value = currentSession.code;
-      document.getElementById("publicLinkDisplay").value = publicLink();
-      document.getElementById("sessionStatus").textContent = "Activa";
-      document.getElementById("questionCount").textContent = "0";
-
       window.history.replaceState(null, "", "?creator=" + currentSession.id);
 
       showView("creatorView");
+      updateCreatorUI();
       renderCreatorQuestions();
       subscribeRealtime();
 
-      showSuccess("Sesión creada. Comparte el código con asistentes.");
+      showSuccess("Sesión creada.");
     }
 
     async function joinSession(code) {
+      hideMessages();
+
       const { data, error } = await db
         .from("sessions")
         .select("*")
@@ -653,20 +691,17 @@
       currentSession = data;
       isCreator = false;
 
-      document.getElementById("publicTitle").textContent = currentSession.title;
-      document.getElementById("publicBadge").textContent = currentSession.is_active ? "● en directo" : "sesión cerrada";
-      document.getElementById("publicBadge").classList.toggle("closed", !currentSession.is_active);
-      document.getElementById("submitQuestionButton").disabled = !currentSession.is_active;
-      document.getElementById("submitQuestionButton").textContent = currentSession.is_active ? "Enviar pregunta" : "Sesión cerrada";
-
       window.history.replaceState(null, "", "?session=" + encodeURIComponent(currentSession.code));
 
       showView("publicView");
+      updatePublicUI();
       await loadQuestions();
       subscribeRealtime();
     }
 
     async function openCreatorById(id) {
+      hideMessages();
+
       const creatorId = localStorage.getItem("charlemos_creator_session");
 
       if (creatorId !== id) {
@@ -688,12 +723,8 @@
       currentSession = data;
       isCreator = true;
 
-      document.getElementById("creatorTitle").textContent = currentSession.title;
-      document.getElementById("sessionCodeDisplay").value = currentSession.code;
-      document.getElementById("publicLinkDisplay").value = publicLink();
-      document.getElementById("sessionStatus").textContent = currentSession.is_active ? "Activa" : "Cerrada";
-
       showView("creatorView");
+      updateCreatorUI();
       await loadQuestions();
       subscribeRealtime();
     }
@@ -715,6 +746,8 @@
       questions = data || [];
       renderPublicQuestions();
       renderCreatorQuestions();
+      updateCreatorUI();
+      updatePublicUI();
     }
 
     function filteredQuestions() {
@@ -798,6 +831,7 @@
 
       if (realtimeChannel) {
         db.removeChannel(realtimeChannel);
+        realtimeChannel = null;
       }
 
       realtimeChannel = db
@@ -823,14 +857,6 @@
           async payload => {
             if (payload.new) {
               currentSession = payload.new;
-
-              if (!currentSession.is_active) {
-                document.getElementById("publicBadge").textContent = "sesión cerrada";
-                document.getElementById("publicBadge").classList.add("closed");
-                document.getElementById("submitQuestionButton").disabled = true;
-                document.getElementById("submitQuestionButton").textContent = "Sesión cerrada";
-                document.getElementById("sessionStatus").textContent = "Cerrada";
-              }
             }
 
             await loadQuestions();
@@ -843,7 +869,7 @@
 
     createSessionForm.addEventListener("submit", event => {
       event.preventDefault();
-      createSession(document.getElementById("sessionName").value.trim());
+      createSession(document.getElementById("sessionName").value);
     });
 
     joinSessionForm.addEventListener("submit", event => {
@@ -853,6 +879,7 @@
 
     questionForm.addEventListener("submit", async event => {
       event.preventDefault();
+      hideMessages();
 
       if (!currentSession || !currentSession.is_active) {
         showError("Esta sesión está cerrada.");
@@ -886,7 +913,7 @@
 
     async function voteQuestion(id) {
       const question = questions.find(q => q.id === id);
-      if (!question) return;
+      if (!question || !currentSession || !currentSession.is_active) return;
 
       const { error } = await db
         .from("questions")
@@ -907,39 +934,133 @@
       if (error) showError("No se ha podido borrar.");
     }
 
-   async function closeSession() {
-  if (!isCreator || !currentSession) return;
+    async function closeSession() {
+      if (!isCreator || !currentSession) return;
 
-  const sessionId = currentSession.id;
+      const button = document.querySelector("button[onclick='closeSession()']");
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Cerrando...";
+      }
 
-  await db
-    .from("questions")
-    .delete()
-    .eq("session_id", sessionId);
+      const sessionId = currentSession.id;
 
-  await db
-    .from("sessions")
-    .update({
-      is_active: false,
-      closed_at: new Date().toISOString()
-    })
-    .eq("id", sessionId);
+      const { error: deleteError } = await db
+        .from("questions")
+        .delete()
+        .eq("session_id", sessionId);
 
-  if (realtimeChannel) {
-    db.removeChannel(realtimeChannel);
-    realtimeChannel = null;
-  }
+      if (deleteError) {
+        showError("No se han podido borrar las preguntas.");
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Cerrar y limpiar";
+        }
+        return;
+      }
 
-  localStorage.removeItem("charlemos_creator_session");
+      const { error: updateError } = await db
+        .from("sessions")
+        .update({
+          is_active: false,
+          closed_at: new Date().toISOString()
+        })
+        .eq("id", sessionId);
 
-  currentSession = null;
-  questions = [];
-  isCreator = false;
+      if (updateError) {
+        showError("No se ha podido cerrar la sesión.");
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Cerrar y limpiar";
+        }
+        return;
+      }
 
-  window.history.replaceState(null, "", window.location.pathname);
+      if (realtimeChannel) {
+        db.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
 
-  showView("homeView");
-}}
+      localStorage.removeItem("charlemos_creator_session");
+
+      currentSession = null;
+      questions = [];
+      isCreator = false;
+
+      window.history.replaceState(null, "", window.location.pathname);
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Cerrar y limpiar";
+      }
+
+      showView("homeView");
+    }
+
+    function copyText(text) {
+      const value = String(text || "");
+      if (!value) return;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value)
+          .then(() => showSuccess("Copiado."))
+          .catch(() => fallbackCopy(value));
+      } else {
+        fallbackCopy(value);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = text;
+      tempInput.setAttribute("readonly", "");
+      tempInput.style.position = "fixed";
+      tempInput.style.left = "-9999px";
+      tempInput.style.top = "0";
+      document.body.appendChild(tempInput);
+      tempInput.focus();
+      tempInput.select();
+
+      try {
+        document.execCommand("copy");
+        showSuccess("Copiado.");
+      } catch (error) {
+        showError("No se ha podido copiar automáticamente. Selecciona el texto y cópialo manualmente.");
+      }
+
+      document.body.removeChild(tempInput);
+    }
+
+    function copyCode() {
+      if (!currentSession) return;
+      copyText(currentSession.code);
+    }
+
+    function copyPublicLink() {
+      if (!currentSession) return;
+      copyText(publicLink());
+    }
+
+    function openPublicLink() {
+      if (!currentSession) return;
+      window.open(publicLink(), "_blank");
+    }
+
+    searchInput.addEventListener("input", renderPublicQuestions);
+    categoryFilter.addEventListener("change", renderPublicQuestions);
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionCode = params.get("session");
+    const creatorId = params.get("creator");
+
+    if (sessionCode) {
+      document.getElementById("joinCode").value = sessionCode;
+      joinSession(sessionCode);
+    }
+
+    if (creatorId) {
+      openCreatorById(creatorId);
+    }
   </script>
 </body>
 </html>
