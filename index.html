@@ -910,22 +910,7 @@
     }
 
     async function closeSession() {
-      if (!isCreator || !currentSession) return;
-      if (!confirm("¿Cerrar la sesión y borrar todas sus preguntas?")) return;
-
-      await db.from("questions").delete().eq("session_id", currentSession.id);
-
-      const { error } = await db
-        .from("sessions")
-        .update({
-          is_active: false,
-          closed_at: new Date().toISOString()
-        })
-        .eq("id", currentSession.id);
-
-      if (error) {
-        showError("No se ha podido cerrar la sesión.");
-        return;
+     closeSession()
       }
 
       questions = [];
