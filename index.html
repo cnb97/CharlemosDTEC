@@ -820,7 +820,7 @@
           </div>
           <h3>${escapeHTML(q.title)}</h3>
           <div class="actions">
-            <button class="danger" onclick="deleteQuestion('${q.id}')">🗑</button>
+            <button class="danger" onclick="deleteQuestion('${q.id}')">Borrar</button>
           </div>
         </article>
       `).join("");
@@ -924,15 +924,23 @@
     }
 
     async function deleteQuestion(id) {
-      if (!isCreator) return;
+  if (!isCreator) return;
 
-      const { error } = await db
-        .from("questions")
-        .delete()
-        .eq("id", id);
+  const { error } = await db
+    .from("questions")
+    .delete()
+    .eq("id", id);
 
-      if (error) showError("No se ha podido borrar.");
-    }
+  if (error) {
+    showError("No se ha podido borrar la pregunta.");
+    return;
+  }
+
+  questions = questions.filter(q => q.id !== id);
+
+  renderCreatorQuestions();
+  renderPublicQuestions();
+}
 
     async function closeSession() {
       if (!isCreator || !currentSession) return;
