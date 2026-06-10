@@ -647,6 +647,11 @@
         return;
       }
 
+      if (!data.is_active) {
+        showError("Esta sesión ya ha sido cerrada.");
+        return;
+      }
+
       currentSession = data;
       isCreator = false;
 
@@ -784,7 +789,7 @@
           </div>
           <h3>${escapeHTML(q.title)}</h3>
           <div class="actions">
-            <button class="danger" onclick="deleteQuestion('${q.id}')">Borrar</button>
+            <button class="danger" onclick="deleteQuestion('${q.id}')">🗑</button>
           </div>
         </article>
       `).join("");
@@ -894,12 +899,7 @@
     }
 
     async function deleteQuestion(id) {
-      if (!isCreator) {
-        showError("Solo puede borrar preguntas quien creó la sesión.");
-        return;
-      }
-
-      if (!confirm("¿Borrar esta pregunta?")) return;
+      if (!isCreator) return;
 
       const { error } = await db
         .from("questions")
@@ -911,32 +911,21 @@
 
    async function closeSession() {
   if (!isCreator || !currentSession) return;
-  if (!confirm("¿Cerrar la sesión y borrar todas sus preguntas?")) return;
 
   const sessionId = currentSession.id;
 
-  const { error: deleteError } = await db
+  await db
     .from("questions")
     .delete()
     .eq("session_id", sessionId);
 
-  if (deleteError) {
-    showError("No se han podido borrar las preguntas.");
-    return;
-  }
-
-  const { error: updateError } = await db
+  await db
     .from("sessions")
     .update({
       is_active: false,
       closed_at: new Date().toISOString()
     })
     .eq("id", sessionId);
-
-  if (updateError) {
-    showError("No se ha podido cerrar la sesión.");
-    return;
-  }
 
   if (realtimeChannel) {
     db.removeChannel(realtimeChannel);
@@ -952,8 +941,7 @@
   window.history.replaceState(null, "", window.location.pathname);
 
   showView("homeView");
-  showSuccess("Sesión cerrada correctamente.");
-}
+}}
   </script>
 </body>
 </html>
