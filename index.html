@@ -14,7 +14,6 @@
       --line: #d8cfc2;
       --accent: #2947ff;
       --accent-soft: #e8ebff;
-      --danger: #9b2c2c;
       --radius: 20px;
     }
 
@@ -47,46 +46,18 @@
       line-height: 1.5;
     }
 
-    .mode-switch {
-      margin: 24px auto 0;
-      display: inline-flex;
-      gap: 8px;
-      padding: 6px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-    }
-
-    .mode-switch button {
-      background: transparent;
-      color: var(--ink);
-      border: 0;
-      padding: 10px 16px;
-      border-radius: 999px;
-      cursor: pointer;
-      font: inherit;
-    }
-
-    .mode-switch button.active {
-      background: var(--ink);
-      color: white;
-    }
-
     main {
       width: min(1120px, 92vw);
       margin: 32px auto 80px;
     }
 
-    .view { display: none; }
-    .view.active { display: block; }
-
-    .student-layout {
+    .layout {
       display: grid;
       grid-template-columns: 390px 1fr;
       gap: 24px;
     }
 
-    .panel, .question, .hero-card, .stat {
+    .panel, .question, .hero-card {
       background: var(--paper);
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -175,6 +146,11 @@
 
     button:hover { opacity: 0.9; }
 
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     .primary {
       width: 100%;
       margin-top: 18px;
@@ -188,7 +164,7 @@
       border: 1px solid var(--line);
     }
 
-    .filters, .moderator-tools {
+    .filters {
       display: flex;
       gap: 10px;
       margin-bottom: 18px;
@@ -196,8 +172,14 @@
       align-items: center;
     }
 
-    .filters input { flex: 1; min-width: 220px; }
-    .filters select { width: 180px; }
+    .filters input {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .filters select {
+      width: 180px;
+    }
 
     .question-list {
       display: grid;
@@ -206,11 +188,6 @@
 
     .question {
       padding: 20px;
-    }
-
-    .question.newest {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft), 0 12px 30px rgba(40, 30, 20, 0.05);
     }
 
     .meta {
@@ -230,11 +207,6 @@
       border-radius: 999px;
       font-size: 0.76rem;
       font-weight: 700;
-    }
-
-    .tag.new {
-      background: var(--ink);
-      color: white;
     }
 
     .question h3 {
@@ -257,13 +229,6 @@
       font-weight: 700;
     }
 
-    .delete {
-      background: transparent;
-      color: var(--danger);
-      border: 1px solid #e0b8b8;
-      margin-left: auto;
-    }
-
     .empty, .loading {
       text-align: center;
       color: var(--muted);
@@ -280,28 +245,6 @@
       border-radius: 14px;
       font-size: 0.9rem;
       line-height: 1.4;
-    }
-
-    .moderator-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .stat {
-      padding: 18px;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 2rem;
-      letter-spacing: -0.05em;
-    }
-
-    .stat span {
-      color: var(--muted);
-      font-size: 0.9rem;
     }
 
     .error {
@@ -322,11 +265,7 @@
     }
 
     @media (max-width: 900px) {
-      .student-layout, .hero-card {
-        grid-template-columns: 1fr;
-      }
-
-      .moderator-grid {
+      .layout, .hero-card {
         grid-template-columns: 1fr;
       }
 
@@ -340,98 +279,71 @@
 <body>
   <header>
     <h1>Charlemos DTEC</h1>
-
-   <div class="mode-switch">
-  <button id="studentModeBtn" class="active" onclick="setMode('student')">Vista público</button>
-  <button id="moderatorModeBtn" onclick="setMode('moderator')">Vista moderación</button>
-</div>
   </header>
 
   <main>
     <div id="errorBox" class="error"></div>
 
-    <section id="studentView" class="view active">
-      <div class="hero-card">
-        <div>
-          <h2>Haz tu pregunta para la charla</h2>
-          <p>Escribe una duda breve. Puedes dejar tu nombre o enviarla como anónima. Las preguntas más votadas suben en la lista pública.</p>
+    <div class="hero-card">
+      <div>
+        <h2>Haz tu pregunta para la charla</h2>
+        <p>Escribe una duda breve. Si otra pregunta también te interesa, puedes votarla.</p>
+      </div>
+      <div class="live-badge">● charla en directo</div>
+    </div>
+
+    <div class="layout">
+      <aside class="panel">
+        <h2>Enviar pregunta</h2>
+
+        <form id="questionForm">
+          <label for="alias">Nombre o alias opcional</label>
+          <input id="alias" placeholder="Ej. anon, 2º DTEC..." />
+
+          <label for="category">Tema</label>
+          <select id="category" required>
+            <option value="Asignaturas">Asignaturas</option>
+            <option value="TFG">TFG</option>
+            <option value="Prácticas">Prácticas</option>
+            <option value="Erasmus">Erasmus</option>
+            <option value="Portfolio">Portfolio</option>
+            <option value="Futuro profesional">Futuro profesional</option>
+            <option value="Vida DTEC">Vida DTEC</option>
+            <option value="Otra">Otra</option>
+          </select>
+
+          <label for="title">Pregunta</label>
+          <textarea id="title" required maxlength="360" placeholder="Escribe aquí tu pregunta..."></textarea>
+
+          <button class="primary" type="submit">Enviar pregunta</button>
+        </form>
+
+        <div class="notice">
+          Las preguntas aparecen en directo y se ordenan por votos.
         </div>
-        <div class="live-badge">● charla en directo</div>
-      </div>
+      </aside>
 
-      <div class="student-layout">
-        <aside class="panel">
-          <h2>Enviar pregunta</h2>
-
-          <form id="questionForm">
-            <label for="alias">Nombre o alias opcional</label>
-            <input id="alias" placeholder="Ej. anon, 2º DTEC..." />
-
-            <label for="category">Tema</label>
-            <select id="category" required>
-              <option value="Asignaturas">Asignaturas</option>
-              <option value="TFG">TFG</option>
-              <option value="Prácticas">Prácticas</option>
-              <option value="Erasmus">Erasmus</option>
-              <option value="Vida DTEC">Vida DTEC</option>
-              <option value="Otra">Otra</option>
-            </select>
-
-            <label for="title">Pregunta</label>
-            <textarea id="title" required maxlength="360" placeholder="Escribe aquí tu pregunta..."></textarea>
-
-            <button class="primary" type="submit">Enviar pregunta</button>
-          </form>
-
-          <div class="notice">
-            La vista pública se ordena por votos. La moderación muestra siempre la última pregunta arriba.
-          </div>
-        </aside>
-
-        <section>
-          <div class="filters">
-            <input id="search" placeholder="Buscar preguntas..." />
-            <select id="filterCategory">
-              <option value="Todas">Todas</option>
-              <option value="Asignaturas">Asignaturas</option>
-              <option value="TFG">TFG</option>
-              <option value="Prácticas">Prácticas</option>
-              <option value="Erasmus">Erasmus</option>
-              <option value="Portfolio">Portfolio</option>
-              <option value="Futuro profesional">Futuro profesional</option>
-              <option value="Vida DTEC">Vida DTEC</option>
-              <option value="Otra">Otra</option>
-            </select>
-          </div>
-
-          <div id="publicQuestionList" class="question-list">
-            <div class="loading">Cargando preguntas...</div>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section id="moderatorView" class="view">
-      <div class="moderator-grid">
-        <div class="stat">
-          <strong id="totalCount">0</strong>
-          <span>preguntas recibidas</span>
+      <section>
+        <div class="filters">
+          <input id="search" placeholder="Buscar preguntas..." />
+          <select id="filterCategory">
+            <option value="Todas">Todas</option>
+            <option value="Asignaturas">Asignaturas</option>
+            <option value="TFG">TFG</option>
+            <option value="Prácticas">Prácticas</option>
+            <option value="Erasmus">Erasmus</option>
+            <option value="Portfolio">Portfolio</option>
+            <option value="Futuro profesional">Futuro profesional</option>
+            <option value="Vida DTEC">Vida DTEC</option>
+            <option value="Otra">Otra</option>
+          </select>
         </div>
-        <div class="stat">
-          <strong id="visibleCount">0</strong>
-          <span>preguntas visibles</span>
+
+        <div id="questionList" class="question-list">
+          <div class="loading">Cargando preguntas...</div>
         </div>
-      </div>
-
-      <div class="moderator-tools">
-        <button class="secondary" onclick="loadQuestions()">Actualizar</button>
-        <button class="delete" onclick="clearAll()">Vaciar charla</button>
-      </div>
-
-      <div id="moderatorQuestionList" class="question-list">
-        <div class="loading">Cargando preguntas...</div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <footer>
@@ -441,26 +353,16 @@
   <script>
     const SUPABASE_URL = "https://ctoknbsfydtbwcdwoosy.supabase.co";
     const SUPABASE_KEY = "sb_publishable_oxyo0yIspxzVQfPoRvVYlw_RReyLtU2";
+
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const questionForm = document.getElementById("questionForm");
-    const publicQuestionList = document.getElementById("publicQuestionList");
-    const moderatorQuestionList = document.getElementById("moderatorQuestionList");
+    const questionList = document.getElementById("questionList");
     const searchInput = document.getElementById("search");
     const filterCategory = document.getElementById("filterCategory");
     const errorBox = document.getElementById("errorBox");
 
-    let currentMode = "student";
     let questions = [];
-
-    function setMode(mode) {
-      currentMode = mode;
-      document.getElementById("studentView").classList.toggle("active", mode === "student");
-      document.getElementById("moderatorView").classList.toggle("active", mode === "moderator");
-      document.getElementById("studentModeBtn").classList.toggle("active", mode === "student");
-      document.getElementById("moderatorModeBtn").classList.toggle("active", mode === "moderator");
-      renderQuestions();
-    }
 
     function showError(message) {
       errorBox.textContent = message;
@@ -498,7 +400,7 @@
       }).format(new Date(dateString));
     }
 
-    function getBaseFilteredQuestions() {
+    function getFilteredQuestions() {
       const searchTerm = searchInput.value.toLowerCase();
       const selectedCategory = filterCategory.value;
 
@@ -508,77 +410,40 @@
           (q.title || "").toLowerCase().includes(searchTerm) ||
           (q.category || "").toLowerCase().includes(searchTerm) ||
           (q.alias || "").toLowerCase().includes(searchTerm)
-        );
-    }
-
-    function getPublicQuestions() {
-      return [...getBaseFilteredQuestions()]
-        .sort((a, b) => (b.votes || 0) - (a.votes || 0) || new Date(b.created_at) - new Date(a.created_at));
-    }
-
-    function getModeratorQuestions() {
-      return [...getBaseFilteredQuestions()]
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    }
-
-    function getNewestId() {
-      if (questions.length === 0) return null;
-      return [...questions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0].id;
+        )
+        .sort((a, b) => {
+          const voteDifference = (b.votes || 0) - (a.votes || 0);
+          if (voteDifference !== 0) return voteDifference;
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
     }
 
     function renderQuestions() {
-      const publicQuestions = getPublicQuestions();
-      const moderatorQuestions = getModeratorQuestions();
-      const newestId = getNewestId();
+      const filteredQuestions = getFilteredQuestions();
 
-      document.getElementById("totalCount").textContent = questions.length;
-      document.getElementById("visibleCount").textContent = moderatorQuestions.length;
-
-      if (publicQuestions.length === 0) {
-        publicQuestionList.innerHTML = `<div class="empty">Todavía no hay preguntas.</div>`;
-      } else {
-        publicQuestionList.innerHTML = publicQuestions.map(q => `
-          <article class="question">
-            <div class="meta">
-              <span class="tag">${escapeHTML(q.category)}</span>
-              <span>por ${escapeHTML(q.alias || "anon")}</span>
-              <span>·</span>
-              <span>${formatDate(q.created_at)}</span>
-            </div>
-
-            <h3>${escapeHTML(q.title)}</h3>
-
-            <div class="actions">
-              <button class="secondary" onclick="voteQuestion('${q.id}')">También quiero saberlo · <span class="count">${q.votes || 0}</span></button>
-            </div>
-          </article>
-        `).join("");
+      if (filteredQuestions.length === 0) {
+        questionList.innerHTML = `<div class="empty">Todavía no hay preguntas.</div>`;
+        return;
       }
 
-      if (moderatorQuestions.length === 0) {
-        moderatorQuestionList.innerHTML = `<div class="empty">No hay preguntas con estos filtros.</div>`;
-      } else {
-        moderatorQuestionList.innerHTML = moderatorQuestions.map(q => `
-          <article class="question ${q.id === newestId ? "newest" : ""}">
-            <div class="meta">
-              ${q.id === newestId ? `<span class="tag new">Última</span>` : ``}
-              <span class="tag">${escapeHTML(q.category)}</span>
-              <span>por ${escapeHTML(q.alias || "anon")}</span>
-              <span>·</span>
-              <span>${formatDate(q.created_at)}</span>
-              <span>·</span>
-              <span><strong>${q.votes || 0}</strong> votos</span>
-            </div>
+      questionList.innerHTML = filteredQuestions.map(q => `
+        <article class="question">
+          <div class="meta">
+            <span class="tag">${escapeHTML(q.category)}</span>
+            <span>por ${escapeHTML(q.alias || "anon")}</span>
+            <span>·</span>
+            <span>${formatDate(q.created_at)}</span>
+          </div>
 
-            <h3>${escapeHTML(q.title)}</h3>
+          <h3>${escapeHTML(q.title)}</h3>
 
-            <div class="actions">
-              <button class="secondary" onclick="voteQuestion('${q.id}')">+1 voto</button>
-              <button class="delete" onclick="deleteQuestion('${q.id}')">Borrar pregunta</button>
-            </div>
-          </article>
-        `).join("");
-      }
+          <div class="actions">
+            <button class="secondary" onclick="voteQuestion('${q.id}')">
+              También quiero saberlo · <span class="count">${q.votes || 0}</span>
+            </button>
+          </div>
+        </article>
+      `).join("");
     }
 
     function escapeHTML(text) {
@@ -620,7 +485,7 @@
 
       questionForm.reset();
       await loadQuestions();
-      document.getElementById("studentView").scrollIntoView({ behavior: "smooth" });
+      document.querySelector("main").scrollIntoView({ behavior: "smooth" });
     });
 
     async function voteQuestion(id) {
@@ -636,40 +501,6 @@
 
       if (error) {
         showError("No se ha podido votar: " + error.message);
-        return;
-      }
-
-      await loadQuestions();
-    }
-
-    async function deleteQuestion(id) {
-      if (!confirm("¿Borrar esta pregunta?")) return;
-      hideError();
-
-      const { error } = await db
-        .from("questions")
-        .delete()
-        .eq("id", id);
-
-      if (error) {
-        showError("No se ha podido borrar: " + error.message);
-        return;
-      }
-
-      await loadQuestions();
-    }
-
-    async function clearAll() {
-      if (!confirm("¿Seguro que quieres borrar todas las preguntas de esta charla?")) return;
-      hideError();
-
-      const { error } = await db
-        .from("questions")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
-
-      if (error) {
-        showError("No se ha podido vaciar la charla: " + error.message);
         return;
       }
 
